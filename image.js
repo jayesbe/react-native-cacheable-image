@@ -22,15 +22,15 @@ class CacheableImage extends React.Component {
         }
     }
 
-	async imageDownloadBegin(info) {
+    async imageDownloadBegin(info) {
 		this.setState({downloading: true, jobId: info.jobId});
-	}
+    }
 
-	async imageDownloadProgress(info) {
+    async imageDownloadProgress(info) {
         if ((info.contentLength / info.bytesWritten) == 1) {
             this.setState({downloading: false, jobId: null});
         }
-	}
+    }
 
     async checkImageCache(imageUri, cachePath, cacheKey) {
         const dirPath = DocumentDirectoryPath+'/'+cachePath;
@@ -39,17 +39,17 @@ class CacheableImage extends React.Component {
         RNFS
         .stat(filePath)
         .then((res) => {
-        	if (res.isFile()) {
-	        	// means file exists, ie, cache-hit
+            if (res.isFile()) {
+		      	// means file exists, ie, cache-hit
     	    	this.setState({cacheable: true, cachedImagePath: filePath});
     	    }
         })
         .catch((err) => {
-        	// means file does not exist
-        	// first make sure directory exists.. then begin download
-        	RNFS
-        	.mkdir(dirPath, true)
-        	.then(() => {
+            // means file does not exist
+            // first make sure directory exists.. then begin download
+            RNFS
+            .mkdir(dirPath, true)
+            .then(() => {
                 // before we change the cachedImagePath.. if the previous cachedImagePath was set.. remove it
                 if (this.state.cacheable && this.state.cachedImagePath) {
                     let delImagePath = this.state.cachedImagePath;
@@ -64,17 +64,16 @@ class CacheableImage extends React.Component {
                     });
                 }
 
-        		// directory exists.. begin download
-        		RNFS
+	        	// directory exists.. begin download
+    	    	RNFS
         		.downloadFile(imageUri, filePath, this.imageDownloadBegin.bind(this), this.imageDownloadProgress.bind(this))
         		.then(() => {
-        			this.setState({cacheable: true, cachedImagePath: filePath});
-        		})
-        		.catch((err) => {
-                    this.setState({cacheable: false, cachedImagePath: null}); 
-        		})
-        		;
-        	})
+                    this.setState({cacheable: true, cachedImagePath: filePath});
+	        	})
+    	        .catch((err) => {
+        	        this.setState({cacheable: false, cachedImagePath: null});
+            	});
+            })
         	.catch((err) => {
                 this.setState({cacheable: false, cachedImagePath: null});
         	})
