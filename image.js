@@ -1,6 +1,7 @@
 
 import React, { Image, ProgressBarAndroid } from 'react-native';
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
+import ResponsiveImage from 'react-native-responsive-image';
 
 const SHA1 = require("crypto-js/sha1");
 const URL = require('url-parse');
@@ -122,18 +123,18 @@ class CacheableImage extends React.Component {
     }
 
     renderCache() {
-    	return (
-            <Image {...this.props} source={{uri: 'file://'+this.state.cachedImagePath}}>
+   		return (
+            <ResponsiveImage {...this.props} source={{uri: 'file://'+this.state.cachedImagePath}}>
     		{this.props.children}
-    		</Image>
-		);
+    		</ResponsiveImage>
+		);	
     }
 
     renderLocal() {
-    	return (
-            <Image {...this.props} >
+		return (
+            <ResponsiveImage {...this.props} >
     		{this.props.children}
-    		</Image>
-		);
+    		</ResponsiveImage>
+		);	
     }
 }

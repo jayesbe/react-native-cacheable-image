@@ -8,12 +8,21 @@ However, if you happen to change the source, the original cached file will be re
 
 This is beneficial in say you have a User Profile Image.  If the user changes their image, the current profile image will be removed from the cache and the new image will be saved to the cache. 
 
+Local assets are not cached and are passed through. (ie, Default/Placeholder Images) 
+
 This component has been tested with AWS CloudFront and as such only uses the path to the image to generate its hash. Any URL query params are ignored. 
 
 Pull Requests for enhancing this component are welcome.    
 
 ## Installation
 npm i react-native-cacheable-image --save
+
+
+## Dependencies
+- [react-native-responsive-image](https://github.com/Dharmoslap/react-native-responsive-image) to provide responsive image handling.
+- [url-parse](https://github.com/unshiftio/url-parse) for url handling
+- [crypto-js](https://github.com/brix/crypto-js) for hashing
+- [react-native-fs](https://github.com/johanneslumpe/react-native-fs) for file system access
 
 ## Usage
 import CacheableImage from 'react-native-cacheable-image'
@@ -33,7 +42,6 @@ import CacheableImage from 'react-native-cacheable-image'
  
 ## TODO
 - add iOS support for loader
-- add Responsive Image support (using react-native-responsive-image)
 
 LEGAL DISCLAIMER
 ----------------
