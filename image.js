@@ -14,7 +14,7 @@ class CacheableImage extends React.Component {
         downloading: false,
         cacheable: true,
         jobId: null
-    }
+    };
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.source != this.props.source) {
