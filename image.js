@@ -1,5 +1,5 @@
-
-import React, { Image, ProgressBarAndroid } from 'react-native';
+import React from 'react';
+import { Image, ProgressBarAndroid } from 'react-native';
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import ResponsiveImage from 'react-native-responsive-image';
 
@@ -55,18 +55,26 @@ class CacheableImage extends React.Component {
                     let delImagePath = this.state.cachedImagePath;
                     RNFS
                     .exists(delImagePath)
-                    .then((res) => { 
+                    .then((res) => {
                         if (res) {
                             RNFS
                             .unlink(delImagePath)
-                            .catch((err) => {}); 
+                            .catch((err) => {});
                         }
                     });
                 }
 
+              let downloadOptions = {
+                fromUrl: imageUri,
+                toFile: filePath,
+                background: true,
+                begin: this.imageDownloadBegin.bind(this),
+                progress: this.imageDownloadProgress.bind(this)
+              };
+
 	        	// directory exists.. begin download
     	    	RNFS
-        		.downloadFile(imageUri, filePath, this.imageDownloadBegin.bind(this), this.imageDownloadProgress.bind(this))
+        		.downloadFile(downloadOptions)
         		.then(() => {
                     this.setState({cacheable: true, cachedImagePath: filePath});
 	        	})
@@ -81,14 +89,14 @@ class CacheableImage extends React.Component {
     }
 
     _processSource(source) {
-        if (source !== null 
-            && typeof source === "object" 
-            && source.hasOwnProperty('uri')) 
+        if (source !== null
+            && typeof source === "object"
+            && source.hasOwnProperty('uri'))
         { // remote
             const url = new URL(source.uri);
             const type = url.pathname.replace(/.*\.(.*)/, '$1');
             const cacheKey = SHA1(url.pathname)+'.'+type;
-            
+
             this.checkImageCache(source.uri, url.host, cacheKey);
             this.setState({isRemote: true});
         }
@@ -126,7 +134,7 @@ class CacheableImage extends React.Component {
             <ResponsiveImage {...this.props} source={{uri: 'file://'+this.state.cachedImagePath}}>
     		{this.props.children}
     		</ResponsiveImage>
-		);	
+		);
     }
 
     renderLocal() {
@@ -134,6 +142,6 @@ class CacheableImage extends React.Component {
             <ResponsiveImage {...this.props} >
     		{this.props.children}
     		</ResponsiveImage>
-		);	
+		);
     }
 }
