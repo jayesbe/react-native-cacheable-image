@@ -8,12 +8,18 @@ const URL = require('url-parse');
 
 export default
 class CacheableImage extends React.Component {
-    state: {
-        isRemote: false,
-        cachedImagePath: null,
-        downloading: false,
-        cacheable: true,
-        jobId: null
+    constructor(props) {
+        super(props)
+        this.imageDownloadBegin = this.imageDownloadBegin.bind(this);
+        this.imageDownloadProgress = this.imageDownloadProgress.bind(this);
+
+        this.state = {
+            isRemote: false,
+            cachedImagePath: null,
+            downloading: false,
+            cacheable: true,
+            jobId: null
+        };
     };
 
     componentWillReceiveProps(nextProps) {
@@ -23,7 +29,7 @@ class CacheableImage extends React.Component {
     }
 
     async imageDownloadBegin(info) {
-		this.setState({downloading: true, jobId: info.jobId});
+        this.setState({downloading: true, jobId: info.jobId});
     }
 
     async imageDownloadProgress(info) {
@@ -40,15 +46,18 @@ class CacheableImage extends React.Component {
         .stat(filePath)
         .then((res) => {
             if (res.isFile()) {
-		      	// means file exists, ie, cache-hit
-    	    	this.setState({cacheable: true, cachedImagePath: filePath});
-    	    }
+                // means file exists, ie, cache-hit
+                this.setState({cacheable: true, cachedImagePath: filePath});
+            }
         })
         .catch((err) => {
             // means file does not exist
             // first make sure directory exists.. then begin download
+            // The NSURLIsExcludedFromBackupKey property can be provided to set this attribute on iOS platforms.
+            // Apple will reject apps for storing offline cache data that does not have this attribute.
+            // https://github.com/johanneslumpe/react-native-fs#mkdirfilepath-string-options-mkdiroptions-promisevoid
             RNFS
-            .mkdir(dirPath, true)
+            .mkdir(dirPath, {NSURLIsExcludedFromBackupKey: true})
             .then(() => {
                 // before we change the cachedImagePath.. if the previous cachedImagePath was set.. remove it
                 if (this.state.cacheable && this.state.cachedImagePath) {
@@ -68,23 +77,23 @@ class CacheableImage extends React.Component {
                 fromUrl: imageUri,
                 toFile: filePath,
                 background: true,
-                begin: this.imageDownloadBegin.bind(this),
-                progress: this.imageDownloadProgress.bind(this)
+                begin: this.imageDownloadBegin,
+                progress: this.imageDownloadProgress
               };
 
-	        	// directory exists.. begin download
-    	    	RNFS
-        		.downloadFile(downloadOptions)
-        		.then(() => {
+                // directory exists.. begin download
+                RNFS
+                .downloadFile(downloadOptions)
+                .then(() => {
                     this.setState({cacheable: true, cachedImagePath: filePath});
-	        	})
-    	        .catch((err) => {
-        	        this.setState({cacheable: false, cachedImagePath: null});
-            	});
+                })
+                .catch((err) => {
+                    this.setState({cacheable: false, cachedImagePath: null});
+                });
             })
-        	.catch((err) => {
+            .catch((err) => {
                 this.setState({cacheable: false, cachedImagePath: null});
-        	})
+            })
         });
     }
 
@@ -110,38 +119,38 @@ class CacheableImage extends React.Component {
     }
 
     componentWillUnmount() {
-    	if (this.state.downloading && this.state.jobId) {
-    		RNFS.stopDownload(this.state.jobId);
-    	}
+        if (this.state.downloading && this.state.jobId) {
+            RNFS.stopDownload(this.state.jobId);
+        }
     }
 
     render() {
-    	if (!this.state.isRemote || !this.state.cacheable) {
-    		return this.renderLocal();
-    	}
+        if (!this.state.isRemote || !this.state.cacheable) {
+            return this.renderLocal();
+        }
 
-    	if (this.state.cacheable && this.state.cachedImagePath) {
-    		return this.renderCache();
-    	}
+        if (this.state.cacheable && this.state.cachedImagePath) {
+            return this.renderCache();
+        }
 
         return (
-       		<ProgressBarAndroid  />
+            <ProgressBarAndroid  />
         );
     }
 
     renderCache() {
-   		return (
+        return (
             <ResponsiveImage {...this.props} source={{uri: 'file://'+this.state.cachedImagePath}}>
-    		{this.props.children}
-    		</ResponsiveImage>
-		);
+            {this.props.children}
+            </ResponsiveImage>
+        );
     }
 
     renderLocal() {
-		return (
+        return (
             <ResponsiveImage {...this.props} >
-    		{this.props.children}
-    		</ResponsiveImage>
-		);
+            {this.props.children}
+            </ResponsiveImage>
+        );
     }
 }
