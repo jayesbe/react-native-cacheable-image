@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ProgressBarAndroid } from 'react-native';
+import { Image, ActivityIndicator } from 'react-native';
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import ResponsiveImage from 'react-native-responsive-image';
 
@@ -134,7 +134,7 @@ class CacheableImage extends React.Component {
         }
 
         return (
-            <ProgressBarAndroid  />
+            <ActivityIndicator  />
         );
     }
 
