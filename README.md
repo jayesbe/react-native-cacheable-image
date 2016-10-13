@@ -24,7 +24,7 @@ npm i react-native-cacheable-image --save
 - [react-native-fs](https://github.com/johanneslumpe/react-native-fs) for file system access
 
 ### Dependency Installation
-- You may have to run `rnpm link` if you have not for react-native-fs. Execute `rnpm link react-native-fs` from the console
+- For `react-native-fs`. You need to link the module. Either try `rnpm link react-native-fs` or `react-native link react-native-fs`. See react-native-fs for more information. 
 
 ## Usage
 import CacheableImage from 'react-native-cacheable-image'
