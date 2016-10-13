@@ -42,8 +42,6 @@ import CacheableImage from 'react-native-cacheable-image'
         />
     </CacheableImage>
  
-## TODO
-- add iOS support for loader
 
 LEGAL DISCLAIMER
 ----------------
