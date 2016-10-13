@@ -23,7 +23,7 @@ npm i react-native-cacheable-image --save
 - [crypto-js](https://github.com/brix/crypto-js) for hashing
 - [react-native-fs](https://github.com/johanneslumpe/react-native-fs) for file system access
 
-### Depedency Installation
+### Dependency Installation
 - You may have to run `rnpm link` if you have not for react-native-fs. Execute `rnpm link react-native-fs` from the console
 
 ## Usage
