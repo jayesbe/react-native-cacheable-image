@@ -17,12 +17,14 @@ Pull Requests for enhancing this component are welcome.
 ## Installation
 npm i react-native-cacheable-image --save
 
-
 ## Dependencies
 - [react-native-responsive-image](https://github.com/Dharmoslap/react-native-responsive-image) to provide responsive image handling.
 - [url-parse](https://github.com/unshiftio/url-parse) for url handling
 - [crypto-js](https://github.com/brix/crypto-js) for hashing
 - [react-native-fs](https://github.com/johanneslumpe/react-native-fs) for file system access
+
+### Depedency Installation
+- You may have to run `rnpm link` if you have not for react-native-fs. Execute `rnpm link react-native-fs` from the console
 
 ## Usage
 import CacheableImage from 'react-native-cacheable-image'
