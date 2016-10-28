@@ -135,17 +135,13 @@ class CacheableImage extends React.Component {
             return this.renderCache();
         }
 
-		if (this.props.defaultSource) {
-			return (
-				<ResponsiveImage {...this.props} source={this.props.defaultSource}>
-	            {this.props.children}
-	            </ResponsiveImage>
-			);
-		} else {
-	        return (
-	            <ActivityIndicator  />
-	        );
-		}
+        if (this.props.defaultSource) {
+            return this.renderDefaultSource();
+        }
+
+        return (
+            <ActivityIndicator  />
+        );
     }
 
     renderCache() {
@@ -159,6 +155,14 @@ class CacheableImage extends React.Component {
     renderLocal() {
         return (
             <ResponsiveImage {...this.props} >
+            {this.props.children}
+            </ResponsiveImage>
+        );
+    }
+
+    renderDefaultSource() {
+        return (
+            <ResponsiveImage {...this.props} source={this.props.defaultSource}>
             {this.props.children}
             </ResponsiveImage>
         );
