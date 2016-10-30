@@ -8,6 +8,7 @@ const URL = require('url-parse');
 
 export default
 class CacheableImage extends React.Component {
+
     constructor(props) {
         super(props)
         this.imageDownloadBegin = this.imageDownloadBegin.bind(this);
@@ -48,9 +49,10 @@ class CacheableImage extends React.Component {
             if (res.isFile() && res.size > 0) {
                 // means file exists, ie, cache-hit
                 this.setState({cacheable: true, cachedImagePath: filePath});
-            } else {
-				throw new Error("checkImageCache: Image is not a nonempty file");
-			}
+            }
+            else {
+                throw new Error("checkImageCache: Image is not a nonempty file");
+            }
         })
         .catch((err) => {
             // means file does not exist
@@ -75,17 +77,18 @@ class CacheableImage extends React.Component {
                     });
                 }
 
-              let downloadOptions = {
-                fromUrl: imageUri,
-                toFile: filePath,
-                background: true,
-                begin: this.imageDownloadBegin,
-                progress: this.imageDownloadProgress
-              };
+                let downloadOptions = {
+                    fromUrl: imageUri,
+                    toFile: filePath,
+                    background: true,
+                    begin: this.imageDownloadBegin,
+                    progress: this.imageDownloadProgress
+                };
 
                 // directory exists.. begin download
                 RNFS
                 .downloadFile(downloadOptions)
+                .promise
                 .then(() => {
                     this.setState({cacheable: true, cachedImagePath: filePath});
                 })
@@ -126,21 +129,21 @@ class CacheableImage extends React.Component {
         }
     }
 
-    render() {
-        if (!this.state.isRemote || !this.state.cacheable) {
+    render() {        
+        if (!this.state.isRemote && !this.state.cacheable) {
             return this.renderLocal();
         }
 
         if (this.state.cacheable && this.state.cachedImagePath) {
             return this.renderCache();
         }
-
+        
         if (this.props.defaultSource) {
             return this.renderDefaultSource();
         }
-
+        
         return (
-            <ActivityIndicator  />
+            <ActivityIndicator {...this.props.activityIndicatorProps} />
         );
     }
 
@@ -161,10 +164,15 @@ class CacheableImage extends React.Component {
     }
 
     renderDefaultSource() {
+        const { defaultSource, ...props } = this.props;
         return (
-            <ResponsiveImage {...this.props} source={this.props.defaultSource}>
+            <CacheableImage {...props} source={defaultSource}>
             {this.props.children}
-            </ResponsiveImage>
+            </CacheableImage>
         );
     }
 }
+
+CacheableImage.propTypes = {
+    activityIndicatorProps: React.PropTypes.object
+};
