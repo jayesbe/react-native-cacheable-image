@@ -29,6 +29,12 @@ npm i react-native-cacheable-image --save
 ## Usage
 import CacheableImage from 'react-native-cacheable-image'
 
+### Props
+
+* `activityIndicatorProps` - pass this property to alter the ActivityIndicator
+* `defaultSource`           - pass this property to provide a default source to fallback on (the defaultSource is attached to another CacheableImage component)
+
+
 ## Example
 
     <CacheableImage 
@@ -38,7 +44,8 @@ import CacheableImage from 'react-native-cacheable-image'
     >
 	    <CacheableImage
             style={styles.nestedImage}
-            source={require(./someImage.jpeg)}  	
+            source={require(./someImage.jpeg)}
+            defaultSource={{uri: 'http://www.foobar.com/defaultImage.jpeg'}}
         />
     </CacheableImage>
  
