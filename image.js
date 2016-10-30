@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ActivityIndicator } from 'react-native';
+import { Image, ActivityIndicator, NetInfo } from 'react-native';
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import ResponsiveImage from 'react-native-responsive-image';
 
@@ -13,13 +13,15 @@ class CacheableImage extends React.Component {
         super(props)
         this.imageDownloadBegin = this.imageDownloadBegin.bind(this);
         this.imageDownloadProgress = this.imageDownloadProgress.bind(this);
-
+        this._handleConnectivityChange = this._handleConnectivityChange.bind(this);
+        
         this.state = {
             isRemote: false,
             cachedImagePath: null,
             downloading: false,
             cacheable: true,
-            jobId: null
+            jobId: null,
+            networkAvailable: false
         };
     };
 
@@ -29,6 +31,13 @@ class CacheableImage extends React.Component {
         }
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextState === this.state && nextProps === this.props) {
+            return false;
+        }
+        return true;
+    }
+    
     async imageDownloadBegin(info) {
         this.setState({downloading: true, jobId: info.jobId});
     }
@@ -52,8 +61,15 @@ class CacheableImage extends React.Component {
             }
         })
         .catch((err) => {
+        
             // means file does not exist
-            // first make sure directory exists.. then begin download
+            // first make sure network is available..
+            if (this.state.networkAvailable) {
+                this.setState({cacheable: false, cachedImagePath: null});
+                return;
+            }
+                        
+            // then make sure directory exists.. then begin download
             // The NSURLIsExcludedFromBackupKey property can be provided to set this attribute on iOS platforms.
             // Apple will reject apps for storing offline cache data that does not have this attribute.
             // https://github.com/johanneslumpe/react-native-fs#mkdirfilepath-string-options-mkdiroptions-promisevoid
@@ -117,15 +133,25 @@ class CacheableImage extends React.Component {
     }
 
     componentWillMount() {
+        NetInfo.isConnected.addEventListener('change', this._handleConnectivityChange);
+        
         this._processSource(this.props.source);
     }
 
     componentWillUnmount() {
+        NetInfo.isConnected.removeEventListener('change', this._handleConnectivityChange);
+    
         if (this.state.downloading && this.state.jobId) {
             RNFS.stopDownload(this.state.jobId);
         }
     }
 
+    async _handleConnectivityChange(isConnected) {
+	    this.setState({
+            networkAvailable: isConnected,
+	    });
+    };
+  
     render() {        
         if (!this.state.isRemote && !this.state.cacheable) {
             return this.renderLocal();
