@@ -46,12 +46,9 @@ class CacheableImage extends React.Component {
         RNFS
         .stat(filePath)
         .then((res) => {
-            if (res.isFile() && res.size > 0) {
+            if (res.isFile()) {
                 // means file exists, ie, cache-hit
                 this.setState({cacheable: true, cachedImagePath: filePath});
-            }
-            else {
-                throw new Error("checkImageCache: Image is not a nonempty file");
             }
         })
         .catch((err) => {
