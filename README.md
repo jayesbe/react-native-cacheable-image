@@ -46,7 +46,11 @@ import CacheableImage from 'react-native-cacheable-image'
             style={styles.nestedImage}
             source={require(./someImage.jpeg)}
             defaultSource={{uri: 'http://www.foobar.com/defaultImage.jpeg'}}
-        />
+        >
+            <View>
+                <Text>Example</Text>
+            </View>
+        </CacheableImage>
     </CacheableImage>
  
 
