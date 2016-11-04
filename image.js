@@ -79,15 +79,7 @@ class CacheableImage extends React.Component {
                 // before we change the cachedImagePath.. if the previous cachedImagePath was set.. remove it
                 if (this.state.cacheable && this.state.cachedImagePath) {
                     let delImagePath = this.state.cachedImagePath;
-                    RNFS
-                    .exists(delImagePath)
-                    .then((res) => {
-                        if (res) {
-                            RNFS
-                            .unlink(delImagePath)
-                            .catch((err) => {});
-                        }
-                    });
+                    this.deleteFilePath(delImagePath);
                 }
 
                 let downloadOptions = {
@@ -106,23 +98,38 @@ class CacheableImage extends React.Component {
                     this.setState({cacheable: true, cachedImagePath: filePath});
                 })
                 .catch((err) => {
+                    // error occurred while downloading or download stopped.. remove file if created
+                    this._deleteFilePath(filePath);
                     this.setState({cacheable: false, cachedImagePath: null});
                 });
             })
             .catch((err) => {
+                this._deleteFilePath(filePath);
                 this.setState({cacheable: false, cachedImagePath: null});
             })
         });
     }
 
+    _deleteFilePath(filePath) {
+        RNFS
+        .exists(filePath)
+        .then((res) => {
+            if (res) {
+                RNFS
+                .unlink(filePath)
+                .catch((err) => {});
+            }
+        });
+    }
+    
     _processSource(source) {
         if (source !== null
             && typeof source === "object"
             && source.hasOwnProperty('uri'))
         { // remote
             const url = new URL(source.uri);
-            const type = url.pathname.replace(/.*\.(.*)/, '$1');
-            const cacheKey = SHA1(url.pathname)+'.'+type;
+            // const type = url.pathname.replace(/.*\.(.*)/, '$1');
+            const cacheKey = SHA1(url.pathname); // +'.'+type;
 
             this.checkImageCache(source.uri, url.host, cacheKey);
             this.setState({isRemote: true});
@@ -165,37 +172,50 @@ class CacheableImage extends React.Component {
             return this.renderDefaultSource();
         }
         
+        // handle activityIndicator props (wonder if this can be more clean)
+        let style = {}, props = {};
+        if (this.props.hasOwnProperty('activityIndicatorProps')) {
+            let { ...props } = this.props.activityIndicatorProps;
+            
+            if (props.hasOwnProperty('style')) {
+                let { style, ...props } = props;
+            }
+        }
+        
         return (
-            <ActivityIndicator {...this.props.activityIndicatorProps} />
+            <ActivityIndicator style={[{ backgroundColor: 'transparent', flex: 1 }, style]} {...props} />
         );
     }
 
     renderCache() {
+        const { style, children, defaultSource, activityIndicatorProps, ...props } = this.props;
         return (
-            <ResponsiveImage {...this.props} source={{uri: 'file://'+this.state.cachedImagePath}}>
-            {this.props.children}
+            <ResponsiveImage style={[{ backgroundColor: 'transparent' }, style]} {...props} source={{uri: 'file://'+this.state.cachedImagePath}}>
+            {children}
             </ResponsiveImage>
         );
     }
 
     renderLocal() {
+        const { style, children, defaultSource, activityIndicatorProps, ...props } = this.props;
         return (
-            <ResponsiveImage {...this.props} >
-            {this.props.children}
+            <ResponsiveImage style={[{ backgroundColor: 'transparent' }, style]} {...props}>
+            {children}
             </ResponsiveImage>
         );
     }
 
     renderDefaultSource() {
-        const { defaultSource, ...props } = this.props;
+        const { children, defaultSource, ...props } = this.props;
         return (
             <CacheableImage {...props} source={defaultSource}>
-            {this.props.children}
+            {children}
             </CacheableImage>
         );
     }
 }
 
 CacheableImage.propTypes = {
-    activityIndicatorProps: React.PropTypes.object
+    activityIndicatorProps: React.PropTypes.object,
+    defaultSource: React.PropTypes.object
 };
