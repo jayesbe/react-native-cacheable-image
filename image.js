@@ -128,10 +128,21 @@ class CacheableImage extends React.Component {
             && source.hasOwnProperty('uri'))
         { // remote
             const url = new URL(source.uri, null, true);
+            
+            // handle query params for cache key
             let cacheable = url.pathname;
-            if (this.props.useQueryParamsInCacheKey) {
+            if (Array.isArray(this.props.useQueryParamsInCacheKey)) {
+                this.props.useQueryParamsInCacheKey.forEach(function(k) {
+                    if (url.query.hasOwnProperty(k)) {
+                        cacheable = cacheable.concat(url.query[k]);
+                    }    
+                });                
+            }
+            else if (this.props.useQueryParamsInCacheKey) {
                 cacheable = cacheable.concat(url.query);
             }
+            
+            // ignore extension
             // const type = url.pathname.replace(/.*\.(.*)/, '$1');
             const cacheKey = SHA1(cacheable); // +'.'+type;
 
@@ -212,7 +223,10 @@ class CacheableImage extends React.Component {
 CacheableImage.propTypes = {
     activityIndicatorProps: React.PropTypes.object,
     defaultSource: React.PropTypes.object,
-    useQueryParamsInCacheKey: React.PropTypes.bool
+    useQueryParamsInCacheKey: React.PropTypes.oneOfType([
+        React.PropTypes.bool,
+        React.PropTypes.array
+    ])
 };
 
 

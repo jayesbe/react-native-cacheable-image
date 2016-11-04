@@ -33,7 +33,7 @@ import CacheableImage from 'react-native-cacheable-image'
 
 * `activityIndicatorProps` - pass this property to alter the ActivityIndicator
 * `defaultSource`           - pass this property to provide a default source to fallback on (the defaultSource is attached to another CacheableImage component)
-
+* `useQueryParamsInCacheKey` - Defaults to false for backwards compatibility. Set to true to include query parameters in cache key generation. Set to an array of parameters to only include specific parameters in cache key generation. 
 
 ## Example
 
