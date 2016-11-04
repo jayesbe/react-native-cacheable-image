@@ -128,8 +128,12 @@ class CacheableImage extends React.Component {
             && source.hasOwnProperty('uri'))
         { // remote
             const url = new URL(source.uri);
+            let cacheable = url.pathname;
+            if (this.props.useQueryParamsInCacheKey) {
+                cacheable = cacheable.concat(url.query);
+            }
             // const type = url.pathname.replace(/.*\.(.*)/, '$1');
-            const cacheKey = SHA1(url.pathname); // +'.'+type;
+            const cacheKey = SHA1(cacheable); // +'.'+type;
 
             this.checkImageCache(source.uri, url.host, cacheKey);
             this.setState({isRemote: true});
@@ -171,35 +175,25 @@ class CacheableImage extends React.Component {
         if (this.props.defaultSource) {
             return this.renderDefaultSource();
         }
-        
-        // handle activityIndicator props (wonder if this can be more clean)
-        let style = {}, props = {};
-        if (this.props.hasOwnProperty('activityIndicatorProps')) {
-            let { ...props } = this.props.activityIndicatorProps;
-            
-            if (props.hasOwnProperty('style')) {
-                let { style, ...props } = props;
-            }
-        }
-        
+
         return (
-            <ActivityIndicator style={[{ backgroundColor: 'transparent', flex: 1 }, style]} {...props} />
+            <ActivityIndicator {...this.props.activityIndicatorProps} />
         );
     }
 
     renderCache() {
-        const { style, children, defaultSource, activityIndicatorProps, ...props } = this.props;
+        const { children, defaultSource, activityIndicatorProps, ...props } = this.props;
         return (
-            <ResponsiveImage style={[{ backgroundColor: 'transparent' }, style]} {...props} source={{uri: 'file://'+this.state.cachedImagePath}}>
+            <ResponsiveImage {...props} source={{uri: 'file://'+this.state.cachedImagePath}}>
             {children}
             </ResponsiveImage>
         );
     }
 
     renderLocal() {
-        const { style, children, defaultSource, activityIndicatorProps, ...props } = this.props;
+        const { children, defaultSource, activityIndicatorProps, ...props } = this.props;
         return (
-            <ResponsiveImage style={[{ backgroundColor: 'transparent' }, style]} {...props}>
+            <ResponsiveImage {...props}>
             {children}
             </ResponsiveImage>
         );
@@ -217,5 +211,15 @@ class CacheableImage extends React.Component {
 
 CacheableImage.propTypes = {
     activityIndicatorProps: React.PropTypes.object,
-    defaultSource: React.PropTypes.object
+    defaultSource: React.PropTypes.object,
+    useQueryParamsInCacheKey: React.PropTypes.bool
+};
+
+
+CacheableImage.defaultProps = {
+    style: { backgroundColor: 'transparent' },
+    activityIndicatorProps: {
+        style: { backgroundColor: 'transparent', flex: 1 }
+    },
+    useQueryParamsInCacheKey: false // bc
 };
