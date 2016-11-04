@@ -64,7 +64,7 @@ class CacheableImage extends React.Component {
         
             // means file does not exist
             // first make sure network is available..
-            if (this.state.networkAvailable) {
+            if (! this.state.networkAvailable) {
                 this.setState({cacheable: false, cachedImagePath: null});
                 return;
             }
@@ -156,6 +156,10 @@ class CacheableImage extends React.Component {
 
     componentWillMount() {
         NetInfo.isConnected.addEventListener('change', this._handleConnectivityChange);
+        // initial
+        NetInfo.isConnected.fetch().then(isConnected => {
+            this.setState({networkAvailable: isConnected});
+		});
         
         this._processSource(this.props.source);
     }

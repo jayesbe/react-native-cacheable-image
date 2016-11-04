@@ -26,6 +26,13 @@ npm i react-native-cacheable-image --save
 ### Dependency Installation
 - For `react-native-fs`. You need to link the module. Either try `rnpm link react-native-fs` or `react-native link react-native-fs`. See react-native-fs for more information. 
 
+### Network Status
+#### Android
+
+Add the following line to your android/app/src/AndroidManifest.xml
+
+`<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
+
 ## Usage
 import CacheableImage from 'react-native-cacheable-image'
 
