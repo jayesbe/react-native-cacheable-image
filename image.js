@@ -127,7 +127,7 @@ class CacheableImage extends React.Component {
             && typeof source === "object"
             && source.hasOwnProperty('uri'))
         { // remote
-            const url = new URL(source.uri);
+            const url = new URL(source.uri, null, true);
             let cacheable = url.pathname;
             if (this.props.useQueryParamsInCacheKey) {
                 cacheable = cacheable.concat(url.query);
