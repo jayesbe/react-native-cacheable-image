@@ -179,7 +179,7 @@ class CacheableImage extends React.Component {
     };
   
     render() {        
-        if (!this.state.isRemote && !this.state.cacheable) {
+        if (!this.state.isRemote) {
             return this.renderLocal();
         }
 
