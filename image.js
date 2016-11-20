@@ -179,7 +179,7 @@ class CacheableImage extends React.Component {
     };
   
     render() {        
-        if (!this.state.isRemote && !this.state.cacheable) {
+        if (!this.state.isRemote) {
             return this.renderLocal();
         }
 
@@ -226,7 +226,7 @@ class CacheableImage extends React.Component {
 
 CacheableImage.propTypes = {
     activityIndicatorProps: React.PropTypes.object,
-    defaultSource: React.PropTypes.object,
+    defaultSource: Image.propTypes.source,
     useQueryParamsInCacheKey: React.PropTypes.oneOfType([
         React.PropTypes.bool,
         React.PropTypes.array
