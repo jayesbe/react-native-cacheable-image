@@ -124,6 +124,7 @@ class CacheableImage extends React.Component {
     
     _processSource(source) {
         if (source !== null
+		    && source != ''
             && typeof source === "object"
             && source.hasOwnProperty('uri'))
         { // remote

@@ -34,7 +34,9 @@ Add the following line to your android/app/src/AndroidManifest.xml
 `<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>`
 
 ## Usage
+```javascript
 import CacheableImage from 'react-native-cacheable-image'
+```
 
 ### Props
 
@@ -44,21 +46,23 @@ import CacheableImage from 'react-native-cacheable-image'
 
 ## Example
 
+```jsx
     <CacheableImage 
         resizeMode="cover"
         style={{flex: 1}}
-        source={{uri: 'http://www.foobar.com/image.jpeg'}}
+        source={{uri: "http://www.foobar.com/image.jpeg"}}
     >
 	    <CacheableImage
             style={styles.nestedImage}
             source={require(./someImage.jpeg)}
-            defaultSource={{uri: 'http://www.foobar.com/defaultImage.jpeg'}}
+            defaultSource={{uri: "http://www.foobar.com/defaultImage.jpeg"}}
         >
             <View>
                 <Text>Example</Text>
             </View>
         </CacheableImage>
     </CacheableImage>
+```
  
 
 LEGAL DISCLAIMER
