@@ -21,7 +21,7 @@ class CacheableImage extends React.Component {
             downloading: false,
             cacheable: true,
             jobId: null,
-            networkAvailable: false
+            networkAvailable: props.networkAvailable
         };
     };
 
@@ -157,10 +157,10 @@ class CacheableImage extends React.Component {
 
     componentWillMount() {
         NetInfo.isConnected.addEventListener('change', this._handleConnectivityChange);
-        // initial
-        NetInfo.isConnected.fetch().then(isConnected => {
-            this.setState({networkAvailable: isConnected});
-		});
+        
+	if (this.props.checkNetwork) {
+            NetInfo.isConnected.fetch().done(this._handleConnectivityChange);
+        }
         
         this._processSource(this.props.source);
     }
@@ -217,8 +217,10 @@ class CacheableImage extends React.Component {
 
     renderDefaultSource() {
         const { children, defaultSource, ...props } = this.props;
+	const { children, defaultSource, checkNetwork, ...props } = this.props;
+        const { networkAvailable } = this.state;
         return (
-            <CacheableImage {...props} source={defaultSource}>
+            <CacheableImage {...props} source={defaultSource} checkNetwork={false} networkAvailable={networkAvailable} >
             {children}
             </CacheableImage>
         );
@@ -231,7 +233,9 @@ CacheableImage.propTypes = {
     useQueryParamsInCacheKey: React.PropTypes.oneOfType([
         React.PropTypes.bool,
         React.PropTypes.array
-    ])
+    ]),
+    checkNetwork: React.PropTypes.bool,
+    networkAvailable: React.PropTypes.bool
 };
 
 
@@ -240,5 +244,7 @@ CacheableImage.defaultProps = {
     activityIndicatorProps: {
         style: { backgroundColor: 'transparent', flex: 1 }
     },
-    useQueryParamsInCacheKey: false // bc
+    useQueryParamsInCacheKey: false, // bc
+    checkNetwork: true,
+    networkAvailable: false
 };
