@@ -28,9 +28,7 @@ class CacheableImage extends React.Component {
     };
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.source != this.props.source
-            && nextProps.source.hasOwnProperty('uri') && this.props.source.hasOwnProperty('uri')
-            && nextProps.source.uri != this.props.source.uri) {
+        if (nextProps.source != this.props.source) {
             this._processSource(nextProps.source);
         }
     }
@@ -153,27 +151,28 @@ class CacheableImage extends React.Component {
             && typeof source === "object"
             && source.hasOwnProperty('uri'))
         { // remote
-            const url = new URL(source.uri, null, true);
+            if (!(this.jobId && this.props.source.hasOwnProperty('uri') && this.props.source.uri == source.uri)) {
+                const url = new URL(source.uri, null, true);
 
-            // handle query params for cache key
-            let cacheable = url.pathname;
-            if (Array.isArray(this.props.useQueryParamsInCacheKey)) {
-                this.props.useQueryParamsInCacheKey.forEach(function(k) {
-                    if (url.query.hasOwnProperty(k)) {
-                        cacheable = cacheable.concat(url.query[k]);
-                    }
-                });
+                // handle query params for cache key
+                let cacheable = url.pathname;
+                if (Array.isArray(this.props.useQueryParamsInCacheKey)) {
+                    this.props.useQueryParamsInCacheKey.forEach(function(k) {
+                        if (url.query.hasOwnProperty(k)) {
+                            cacheable = cacheable.concat(url.query[k]);
+                        }
+                    });
+                }
+                else if (this.props.useQueryParamsInCacheKey) {
+                    cacheable = cacheable.concat(url.query);
+                }
+
+                const type = url.pathname.replace(/.*\.(.*)/, '$1');
+                const cacheKey = SHA1(cacheable) + (type.length < url.pathname.length ? '.' + type : '');
+
+                this.checkImageCache(source.uri, url.host, cacheKey);
+                this.setState({isRemote: true});
             }
-            else if (this.props.useQueryParamsInCacheKey) {
-                cacheable = cacheable.concat(url.query);
-            }
-
-            // ignore extension
-            const type = url.pathname.replace(/.*\.(.*)/, '$1');
-            const cacheKey = SHA1(cacheable) + '.' + (type.length < url.pathname.length ? type : '');
-
-            this.checkImageCache(source.uri, url.host, cacheKey);
-            this.setState({isRemote: true});
         }
         else {
             this.setState({isRemote: false});
@@ -189,9 +188,8 @@ class CacheableImage extends React.Component {
     }
 
     componentWillMount() {
-        NetInfo.isConnected.addEventListener('change', this._handleConnectivityChange);
-
         if (this.props.checkNetwork) {
+            NetInfo.isConnected.addEventListener('change', this._handleConnectivityChange);
             // componentWillUnmount unsets this._handleConnectivityChange in case the component unmounts before this fetch resolves
             NetInfo.isConnected.fetch().done((isConnected) => this._handleConnectivityChange && this._handleConnectivityChange(isConnected));
         }
@@ -200,8 +198,10 @@ class CacheableImage extends React.Component {
     }
 
     componentWillUnmount() {
-        NetInfo.isConnected.removeEventListener('change', this._handleConnectivityChange);
-        this._handleConnectivityChange = null;
+        if (this.props.checkNetwork) {
+            NetInfo.isConnected.removeEventListener('change', this._handleConnectivityChange);
+            this._handleConnectivityChange = null;
+        }
 
         if (this.downloading && this.jobId) {
             this._stopDownload();
