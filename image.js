@@ -85,7 +85,7 @@ class CacheableImage extends React.Component {
                 let downloadOptions = {
                     fromUrl: imageUri,
                     toFile: filePath,
-                    background: true,
+                    background: this.props.downloadInBackground,
                     begin: this.imageDownloadBegin,
                     progress: this.imageDownloadProgress
                 };
@@ -231,7 +231,8 @@ CacheableImage.propTypes = {
     useQueryParamsInCacheKey: React.PropTypes.oneOfType([
         React.PropTypes.bool,
         React.PropTypes.array
-    ])
+    ]),
+    downloadInBackground: React.PropTypes.bool
 };
 
 
@@ -240,5 +241,6 @@ CacheableImage.defaultProps = {
     activityIndicatorProps: {
         style: { backgroundColor: 'transparent', flex: 1 }
     },
-    useQueryParamsInCacheKey: false // bc
+    useQueryParamsInCacheKey: false, // bc
+    downloadInBackground: false
 };
