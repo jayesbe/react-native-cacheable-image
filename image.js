@@ -28,7 +28,7 @@ class CacheableImage extends React.Component {
     };
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.source != this.props.source || nextProps.networkAvailable != this.state.networkAvailable) {
+        if (nextProps.source != this.props.source || nextProps.networkAvailable != this.networkAvailable) {
             this.networkAvailable = nextProps.networkAvailable;
             this._processSource(nextProps.source);
         }
