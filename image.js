@@ -41,6 +41,12 @@ class CacheableImage extends React.Component {
         return true;
     }
     
+    setNativeProps(nativeProps) {
+        if (this._imageComponent) {
+            this._imageComponent.setNativeProps(nativeProps);
+        }
+    }
+
     async imageDownloadBegin(info) {
         switch (info.statusCode) {
             case 404:
@@ -256,15 +262,17 @@ class CacheableImage extends React.Component {
             return this.renderDefaultSource();
         }
         
+        const { children, defaultSource, checkNetwork, networkAvailable, downloadInBackground, activityIndicatorProps, ...props } = this.props;
+        const style = [activityIndicatorProps.style, this.props.style];
         return (
-            <ActivityIndicator {...this.props.activityIndicatorProps} />
+            <ActivityIndicator {...props} {...activityIndicatorProps} style={style} />
         );
     }
 
     renderCache() {
         const { children, defaultSource, checkNetwork, networkAvailable, downloadInBackground, activityIndicatorProps, ...props } = this.props;
         return (
-            <ResponsiveImage {...props} source={{uri: 'file://'+this.state.cachedImagePath}}>
+            <ResponsiveImage {...props} source={{uri: 'file://'+this.state.cachedImagePath}} ref={component => this._imageComponent = component}>
             {children}
             </ResponsiveImage>
         );
@@ -273,7 +281,7 @@ class CacheableImage extends React.Component {
     renderLocal() {
         const { children, defaultSource, checkNetwork, networkAvailable, downloadInBackground, activityIndicatorProps, ...props } = this.props;
         return (
-            <ResponsiveImage {...props}>
+            <ResponsiveImage {...props} ref={component => this._imageComponent = component}>
             {children}
             </ResponsiveImage>
         );
@@ -282,7 +290,7 @@ class CacheableImage extends React.Component {
     renderDefaultSource() {
         const { children, defaultSource, checkNetwork, networkAvailable, ...props } = this.props;        
         return (
-            <CacheableImage {...props} source={defaultSource} checkNetwork={false} networkAvailable={this.networkAvailable} >
+            <CacheableImage {...props} source={defaultSource} checkNetwork={false} networkAvailable={this.networkAvailable} ref={component => this._imageComponent = component}>
             {children}
             </CacheableImage>
         );
