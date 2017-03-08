@@ -301,8 +301,6 @@ CacheableImage.propTypes = {
     downloadInBackground: React.PropTypes.bool
 };
 
-console.log(Platform);
-
 CacheableImage.defaultProps = {
     style: { backgroundColor: 'transparent' },
     activityIndicatorProps: {
