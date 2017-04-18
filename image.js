@@ -247,6 +247,9 @@ class CacheableImage extends React.Component {
 
     async _handleConnectivityChange(isConnected) {
         this.networkAvailable = isConnected;
+        if (this.networkAvailable && this.state.isRemote && !this.state.cachedImagePath) {
+            this._processSource(this.props.source);
+        }
     };
   
     render() {        
