@@ -10,7 +10,8 @@ export default
 class CacheableImage extends React.Component {
 
     constructor(props) {
-        super(props)
+        super(props);
+        
         this.imageDownloadBegin = this.imageDownloadBegin.bind(this);
         this.imageDownloadProgress = this.imageDownloadProgress.bind(this);
         this._handleConnectivityChange = this._handleConnectivityChange.bind(this);
@@ -174,7 +175,8 @@ class CacheableImage extends React.Component {
     
     _processSource(source, skipSourceCheck) {
 
-        if (source !== null
+        if (this.props.storagePermissionGranted 
+            && source !== null
             && source != ''
             && typeof source === "object"
             && source.hasOwnProperty('uri')
@@ -253,7 +255,7 @@ class CacheableImage extends React.Component {
     };
   
     render() {        
-        if (!this.state.isRemote && !this.props.defaultSource) {
+        if ((!this.state.isRemote && !this.props.defaultSource) || !this.props.storagePermissionGranted) {
             return this.renderLocal();
         }
 
@@ -309,7 +311,8 @@ CacheableImage.propTypes = {
     ]),
     checkNetwork: React.PropTypes.bool,
     networkAvailable: React.PropTypes.bool,
-    downloadInBackground: React.PropTypes.bool
+    downloadInBackground: React.PropTypes.bool,
+    storagePermissionGranted: React.PropTypes.bool
 };
 
 CacheableImage.defaultProps = {
@@ -320,5 +323,6 @@ CacheableImage.defaultProps = {
     useQueryParamsInCacheKey: false, // bc
     checkNetwork: true,
     networkAvailable: false,
-    downloadInBackground: (Platform.OS === 'ios') ? false : true
+    downloadInBackground: (Platform.OS === 'ios') ? false : true,
+    storagePermissionGranted: true
 };
