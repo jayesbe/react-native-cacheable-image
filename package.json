@@ -21,7 +21,7 @@
   "homepage": "https://github.com/jayesbe/react-native-cacheable-image#readme",
   "dependencies": {
     "crypto-js": "^3.1.6",
-    "react-native-fs": "^2.1.0-rc.1",
+    "react-native-fs": "^2.3.0",
     "react-native-responsive-image": "^2.0.0",
     "url-parse": "^1.1.1"
   }
