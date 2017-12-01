@@ -10,25 +10,18 @@ const URL = require('url-parse');
 export default
 class CacheableImage extends React.Component {
 
-    constructor(props) {
-        super(props);
-        
-        this.imageDownloadBegin = this.imageDownloadBegin.bind(this);
-        this.imageDownloadProgress = this.imageDownloadProgress.bind(this);
-        this._handleConnectivityChange = this._handleConnectivityChange.bind(this);
-        this._stopDownload = this._stopDownload.bind(this);
-        
-        this.state = {
-            isRemote: false,
-            cachedImagePath: null,
-            cacheable: true
-        };
+    state = {
+      isRemote: false,
+      cachedImagePath: null,
+      cacheable: true
+    }
 
-        this.networkAvailable = props.networkAvailable;
-        this.downloading = false;
-        this.jobId = null;
-    };
-
+    networkAvailable = this.props.networkAvailable
+    
+    downloading = false
+    
+    jobId = null
+            
     componentWillReceiveProps(nextProps) {
         if (nextProps.source != this.props.source || nextProps.networkAvailable != this.networkAvailable) {
             this.networkAvailable = nextProps.networkAvailable;
@@ -49,7 +42,7 @@ class CacheableImage extends React.Component {
         }
     }
 
-    async imageDownloadBegin(info) {
+    imageDownloadBegin = info => {
         switch (info.statusCode) {
             case 404:
             case 403:
@@ -60,14 +53,14 @@ class CacheableImage extends React.Component {
         }
     }
 
-    async imageDownloadProgress(info) {
+    imageDownloadProgress = info => {
         if ((info.contentLength / info.bytesWritten) == 1) {
             this.downloading = false;
             this.jobId = null;
         }
     }
 
-    async checkImageCache(imageUri, cachePath, cacheKey) {
+    checkImageCache = (imageUri, cachePath, cacheKey) => {
         const dirPath = DocumentDirectoryPath+'/'+cachePath;
         const filePath = dirPath+'/'+cacheKey;
         
@@ -162,7 +155,7 @@ class CacheableImage extends React.Component {
         });
     }
 
-    _deleteFilePath(filePath) {
+    _deleteFilePath = (filePath) => {
         RNFS
         .exists(filePath)
         .then((res) => {
@@ -174,7 +167,7 @@ class CacheableImage extends React.Component {
         });
     }
     
-    _processSource(source, skipSourceCheck) {
+    _processSource = (source, skipSourceCheck) => {
 
         if (this.props.storagePermissionGranted 
             && source !== null
@@ -219,7 +212,7 @@ class CacheableImage extends React.Component {
         }
     }
 
-    _stopDownload() {
+    _stopDownload = () => {
         if (!this.jobId) return;
 
         this.downloading = false;
@@ -227,6 +220,13 @@ class CacheableImage extends React.Component {
         this.jobId = null;
     }
 
+    _handleConnectivityChange = isConnected => {
+        this.networkAvailable = isConnected;
+        if (this.networkAvailable && this.state.isRemote && !this.state.cachedImagePath) {
+            this._processSource(this.props.source);
+        }
+    };
+    
     componentWillMount() {
         if (this.props.checkNetwork) {
             NetInfo.isConnected.addEventListener('change', this._handleConnectivityChange);
@@ -247,14 +247,7 @@ class CacheableImage extends React.Component {
             this._stopDownload();
         }
     }
-
-    async _handleConnectivityChange(isConnected) {
-        this.networkAvailable = isConnected;
-        if (this.networkAvailable && this.state.isRemote && !this.state.cachedImagePath) {
-            this._processSource(this.props.source);
-        }
-    };
-  
+      
     render() {        
         if ((!this.state.isRemote && !this.props.defaultSource) || !this.props.storagePermissionGranted) {
             return this.renderLocal();
