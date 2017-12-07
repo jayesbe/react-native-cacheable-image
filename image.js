@@ -1,6 +1,6 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Image, ActivityIndicator, NetInfo, Platform } from 'react-native';
-import PropTypes from 'prop-types';
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import ResponsiveImage from 'react-native-responsive-image';
 
@@ -9,6 +9,31 @@ const URL = require('url-parse');
 
 export default
 class CacheableImage extends React.Component {
+
+    static propTypes = {
+        activityIndicatorProps: PropTypes.object,
+        defaultSource: Image.propTypes.source,
+        useQueryParamsInCacheKey: PropTypes.oneOfType([
+            PropTypes.bool,
+            PropTypes.array
+        ]),
+        checkNetwork: PropTypes.bool,
+        networkAvailable: PropTypes.bool,
+        downloadInBackground: PropTypes.bool,
+        storagePermissionGranted: PropTypes.bool
+    }
+
+    static defaultProps = {
+        style: { backgroundColor: 'transparent' },
+        activityIndicatorProps: {
+            style: { backgroundColor: 'transparent', flex: 1 }
+        },
+        useQueryParamsInCacheKey: false, // bc
+        checkNetwork: true,
+        networkAvailable: false,
+        downloadInBackground: (Platform.OS === 'ios') ? false : true,
+        storagePermissionGranted: true
+    }
 
     state = {
       isRemote: false,
@@ -21,20 +46,6 @@ class CacheableImage extends React.Component {
     downloading = false
     
     jobId = null
-            
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.source != this.props.source || nextProps.networkAvailable != this.networkAvailable) {
-            this.networkAvailable = nextProps.networkAvailable;
-            this._processSource(nextProps.source);
-        }
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextState === this.state && nextProps === this.props) {
-            return false;
-        }
-        return true;
-    }
     
     setNativeProps(nativeProps) {
         if (this._imageComponent) {
@@ -225,7 +236,21 @@ class CacheableImage extends React.Component {
         if (this.networkAvailable && this.state.isRemote && !this.state.cachedImagePath) {
             this._processSource(this.props.source);
         }
-    };
+    }
+    
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.source != this.props.source || nextProps.networkAvailable != this.networkAvailable) {
+            this.networkAvailable = nextProps.networkAvailable;
+            this._processSource(nextProps.source);
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextState === this.state && nextProps === this.props) {
+            return false;
+        }
+        return true;
+    }
     
     componentWillMount() {
         if (this.props.checkNetwork) {
@@ -295,28 +320,3 @@ class CacheableImage extends React.Component {
         );
     }
 }
-
-CacheableImage.propTypes = {
-    activityIndicatorProps: PropTypes.object,
-    defaultSource: Image.propTypes.source,
-    useQueryParamsInCacheKey: PropTypes.oneOfType([
-        PropTypes.bool,
-        PropTypes.array
-    ]),
-    checkNetwork: PropTypes.bool,
-    networkAvailable: PropTypes.bool,
-    downloadInBackground: PropTypes.bool,
-    storagePermissionGranted: PropTypes.bool
-};
-
-CacheableImage.defaultProps = {
-    style: { backgroundColor: 'transparent' },
-    activityIndicatorProps: {
-        style: { backgroundColor: 'transparent', flex: 1 }
-    },
-    useQueryParamsInCacheKey: false, // bc
-    checkNetwork: true,
-    networkAvailable: false,
-    downloadInBackground: (Platform.OS === 'ios') ? false : true,
-    storagePermissionGranted: true
-};
