@@ -1,6 +1,6 @@
 {
   "name": "react-native-cacheable-image",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "An Image component for React Native that will cache itself to disk",
   "main": "image.js",
   "scripts": {
@@ -21,8 +21,9 @@
   "homepage": "https://github.com/jayesbe/react-native-cacheable-image#readme",
   "dependencies": {
     "crypto-js": "^3.1.6",
-    "react-native-fs": "^2.0.1-rc.2",
-    "url-parse": "^1.1.1",
-    "react-native-responsive-image": "^2.2.0"
+    "prop-types": "^15.5.10",
+    "react-native-fs": "^2.3.0",
+    "react-native-responsive-image": "^2.0.0",
+    "url-parse": "^1.1.1"
   }
 }
