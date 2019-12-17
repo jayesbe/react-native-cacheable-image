@@ -1,8 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Image, ActivityIndicator, NetInfo, Platform } from 'react-native';
+import { Image, ActivityIndicator, Platform } from 'react-native';
 import RNFS, { DocumentDirectoryPath } from 'react-native-fs';
 import ResponsiveImage from 'react-native-responsive-image';
+
+// support RN 0.60
+import NetInfo from "@react-native-community/netinfo";
 
 const SHA1 = require("crypto-js/sha1");
 const URL = require('url-parse');
